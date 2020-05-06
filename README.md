@@ -2,7 +2,7 @@
 
 ENGG1340 Project of 3035691054. I am Cheng Ira Rafael D and I am a year 1 BENGG strudent with the UID 3035691054; this is a solo project as my group mate hasn't to my emails for the group project, I was in group 144, and we made zero progress therefore this is my solo project.
 
-The game I will be implementing text based monster battling adventure game where a player will be able to fight monsters in a text based style.
+The game I will be implementing will be called Wandering Warrior, it is a text based monster battling adventure game where a player will be able to fight monsters in a text based style. 
 
 The game will start by asking how many monsters you would like to encounter and the player can input the number and he will then fight monsters with random names and statistics.
 
