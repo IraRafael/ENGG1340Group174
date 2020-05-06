@@ -12,4 +12,6 @@ Players can chose to continue on their journey and immediately fight a monster o
 
 I also intend to implement a combo mechanic where the player's score increases faster for each consecutive monster Killed without stopping at an inn.
 
-Many events from the game, namely the chance of critical strike, what monsters will appear, and what attacs they will use against you, will make use of a random number generator.
+Many events from the game, namely the chance of critical strike, what monsters will appear, and what attacks they will use against you, will make use of a random number generator. This includes codes from <rand>, <ctime> and <cstdlib>. The random number generator will be a function returning the random number for use in the main code.
+
+ The random number generator will be linked with vector lists from <vector> which will be a list of the monsters and a list of their attributes.
