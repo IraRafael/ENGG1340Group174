@@ -11,3 +11,5 @@ I intend to implement a critical strike mechanic which will increase the damage 
 Players can chose to continue on their journey and immediately fight a monster or rest at an Inn. Resting at an inn will break their combo.
 
 I also intend to implement a combo mechanic where the player's score increases faster for each consecutive monster Killed without stopping at an inn.
+
+Many events from the game, namely the chance of critical strike, what monsters will appear, and what attacs they will use against you, will make use of a random number generator.
