@@ -4,6 +4,7 @@
 #include <random>
 #include <cstdlib>
 #include <ctime>
+#include <fstream>
 
 using namespace std;
 
@@ -35,7 +36,7 @@ int usePotion(int& hp, int& potionIndicator, int maxHP, int healVal) {
 	
 }
 
-void fightMonster(vector<string>&resultVector, int &monster, int j, int& end, int& multiplier, int& potions, int& hp, int& score, vector<string> monsterList, vector<vector<string>> moveList, vector<vector<int>> monHealthList, vector<vector<int>> moveValues) {//, vector for abilities and such) {
+void fightMonster(int &maxMultiplier,int &hpAura, int &attackAura, vector<string>&resultVector, int &monster, int j, int& end, int& multiplier, int& potions, int& hp, int& score, vector<string> monsterList, vector<vector<string>> moveList, vector<vector<int>> monHealthList, vector<vector<int>> moveValues) {//, vector for abilities and such) {
 	int call = randNumber(100, 0);
 	int playerAction = 0;
 	
@@ -56,7 +57,7 @@ void fightMonster(vector<string>&resultVector, int &monster, int j, int& end, in
 	//special characteristics for monsters
 	if (call == 51) { monDodgeVal = 10; }
 	if (call == 7) { monCritVal = 40; }
-	int futureValue = 0, expandConstant=0, contractConstant = 0, legendMonsterBonus = 0, highMonsterBonus=0;
+	int futureValue = 0, expandConstant = 0, contractConstant = 0, legendMonsterBonus = 0, highMonsterBonus = 0, strikeDmg = 5, lungeDmg = 7, parryDmg = 5;
 
 	//list of legend monsters for the bonus
 	if (call == 25 or call == 30 or call == 39 or call == 48 or call == 54 or call == 55 or call == 76 or call == 78) {
@@ -66,9 +67,12 @@ void fightMonster(vector<string>&resultVector, int &monster, int j, int& end, in
 		highMonsterBonus = 5; }
 
 	while (hp > 0 and currentHpMonster > 0) {
-		string UI = "Player HP: " + to_string(hp) + "/50				" + monsterList[call] + " HP: " + to_string(currentHpMonster) + "/" + to_string(maxHpMonster) + "\n"
+		int playerMaxHealth = 50 + (hpAura * 5);
+		int playerDodgeVal = 90, monDodgeVal = 90, playerCritVal = 70, monCritVal = 80;
+
+		string UI = "Player HP: " + to_string(hp) + "/" + to_string(playerMaxHealth) +"		"+ monsterList[call] + " HP: " + to_string(currentHpMonster) + "/" + to_string(maxHpMonster) + "\n"
 			+ "Potions: " + to_string(potions) + "\n"
-			+ "Action:	1 Strike 4 power	- Higher chance to critically strike\n	2 Lunge 7 power		- Decreases your chance to dodge the enemy's attack\n	3 Parry 5 power		- Increases your chance to dodge the enemy's attack\n	4 Potion		- Heals 10 HP\n	5 Block			- Decreases the damage of enemy's incoming attack"; // using 4 tabs of separation
+			+ "Action:	1 Strike " + to_string(strikeDmg + attackAura) + " power	- Higher chance to critically strike\n	2 Lunge " + to_string(lungeDmg + attackAura) + " power		- Decreases your chance to dodge the enemy's attack\n	3 Parry " + to_string(parryDmg + attackAura) + " power		- Increases your chance to dodge the enemy's attack\n	4 Potion		- Heals 10 HP\n	5 Block			- Decreases the damage of enemy's incoming attack"; // using 4 tabs of separation
 
 		//All this code represents one round 
 		//Evalluating which attack the monster will use
@@ -87,22 +91,22 @@ void fightMonster(vector<string>&resultVector, int &monster, int j, int& end, in
 			cout << UI << endl << endl << "Select the number of your action: ";
 			cin >> playerAction;
 			if (playerAction == 1) {		//Strike
-				playerCritVal -= 25;
-				playerDamage = 4 + playerBonus;
+				playerCritVal -= 30;
+				playerDamage = 5 + playerBonus;
 				//if a player lands a critical strike
 				critCalculator(playerCritVal, playerDamage, critChancePlayer, playerCritIndicator);
 				y++;
 				playerAttackName = "Strike";
 			}
 			else if (playerAction == 2) {	//Lunge
-				playerDodgeVal -= 5; 
+				playerDodgeVal += 5; 
 				playerDamage = 7 + playerBonus;
 				critCalculator(playerCritVal, playerDamage, critChancePlayer, playerCritIndicator);
 				y++;
 				playerAttackName = "Lunge";
 			}
 			else if (playerAction == 3) {	//Parry
-				playerDodgeVal += 5;
+				playerDodgeVal -= 5;
 				playerDamage = 5 + playerBonus;
 				critCalculator(playerCritVal, playerDamage, critChancePlayer, playerCritIndicator);
 				y++;
@@ -115,7 +119,7 @@ void fightMonster(vector<string>&resultVector, int &monster, int j, int& end, in
 					y++;
 					potions--;
 				}
-				else { cout << "No potions left."; }
+				else { cout << "No potions left."<<endl<<endl; }
 			}
 			else if (playerAction == 5) { playerBlockIndicator += 1; y++; }
 			cout << endl;
@@ -208,13 +212,12 @@ void fightMonster(vector<string>&resultVector, int &monster, int j, int& end, in
 		else if (monAttackName == "Expand") {
 			if (expandConstant == 0) {
 				expandConstant++;
-				currentHpMonster += 20;
 			}
-			expandIndicator = 1;
+			expandIndicator== 1;
 		}
 
 		//contract: a passive attack decreasing the users size which decreases its health by 20 not going under 1 HP
-		else if (monAttackName == "Expand") {
+		else if (monAttackName == "Contract") {
 			currentHpMonster -= 20;
 			if (currentHpMonster <= 0) {
 				currentHpMonster = 1;
@@ -242,6 +245,10 @@ void fightMonster(vector<string>&resultVector, int &monster, int j, int& end, in
 
 			}
 			else if (playerBlockIndicator==0){
+				if(deathWishIndicator > 0) {
+					currentHpMonster -= 10;
+					cout << "The enemy " << monsterList[call] << " dealt 10 damage to herself with " << monAttackName << "." << endl << endl;
+				}
 				if (playerCritIndicator == 0) {
 					cout << "You attacked the enemy " << monsterList[call] << " with " << playerAttackName << " dealing " << playerDamage << "." << endl << endl;
 					currentHpMonster -= playerDamage;
@@ -291,7 +298,7 @@ void fightMonster(vector<string>&resultVector, int &monster, int j, int& end, in
 				}
 				else if (monMultiIndicator > 0) {
 					if (monCritIndicator == 0) {
-						cout << "The enemy " << monsterList[call] << "'s " << monAttackName << " hit " << noMulti << " times and dealt a total of" << monDamage << "." << endl << endl;
+						cout << "The enemy " << monsterList[call] << "'s " << monAttackName << " hit " << noMulti << " times and dealt a total of " << monDamage << "." << endl << endl;
 						hp -= monDamage;
 					}
 					else {
@@ -307,10 +314,11 @@ void fightMonster(vector<string>&resultVector, int &monster, int j, int& end, in
 
 				//if the monster used Contract or Expand
 				else if (contractIndicator > 0 or expandIndicator > 0) {
-					if (expandIndicator > 0 and expandConstant == 0) {
+					if (expandIndicator > 0 and expandConstant == 1) {
 						cout << monsterList[call] << " used Expand and expanded its body increasing its health." << endl << endl;
+						currentHpMonster += 20;
 					}
-					else if (expandIndicator > 0 and expandConstant == 1) {
+					else if (expandIndicator > 0 and expandConstant > 1) {
 						cout << monsterList[call] << " couldn't expand further." << endl << endl;
 					}
 					else if (contractIndicator > 0) {
@@ -341,26 +349,38 @@ void fightMonster(vector<string>&resultVector, int &monster, int j, int& end, in
 			if (legendMonsterBonus > 0) {
 				cout << "You have slain the " << monsterList[call] << " and abtained the Legend Monster Score Bonus!" << endl << endl;
 				legendMonsterBonus = 0;
+				cout << "You obtained Legend's Aura. All attacks are empowered and health increased until the game ends." << endl << endl;
+				hpAura++;
+				attackAura++;
 			}
 			else if (highMonsterBonus > 0) {
 				cout << "You have slain the " << monsterList[call] << " and abtained the Legend Monster Score Bonus!" << endl << endl;
 				highMonsterBonus = 0;
+				cout << "You obtained High's Aura. Health increased until the game ends." << endl << endl;
+				hpAura++;
 			}
 			else {
 				cout << "You have slain the " << monsterList[call] << "!" << endl << endl;
 			}
-			multiplier += 1;
-			cout << "Score: " << score << "		Multiplier: " << multiplier << "		Monsters: " << j + 1 << "/" << monster << endl << endl << "Would you like to stop at an inn and rest? (This will reset your score multiplier)" << endl << endl << "1 - Rest at the Inn		2 - Continue onwards" << endl << endl << "Please type the number of your choice: ";
+			if (randNumber(10, 1) > 5) {
+				cout << "You obtained 1 potion." << endl << endl;
+				potions += 1;
+			}
+			if (j + 1 == monster) {
+				end++;
+			}
+			if (end == 0){
+				cout << "Score: " << score << "		Multiplier: " << multiplier << "		Monsters: " << j + 1 << "/" << monster << endl << endl << "Would you like to stop at an inn and rest? (This will reset your score multiplier)" << endl << endl << "1 - Rest at the Inn		2 - Continue onwards" << endl << endl << "Please type the number of your choice: ";
+			}
+			
 		}
 		else if (hp <= 0)
 		{
 			cout << "You have been slain by the " << monsterList[call] << "." << endl << endl;
 			end++;
 		}
+		if (multiplier > maxMultiplier) { maxMultiplier = multiplier; }
 		
-		if (j+1 == monster) {
-			end++;
-		}
 	}
 
 	
@@ -594,7 +614,7 @@ int main() {
 	srand(time(0)); // this will trigger the ability for random events to occur with the rand() command
 	cout << "Welcome Wandering Warrior!" << endl<<endl << "Wizzard Wallace: I, Wizzard Wallace, have heard from the King that you, Warrior, will be embarking on a journey to a distant land!" << endl <<endl << "Wizzard Wallace: May I graciously ask you humble warrior how many monsters you expect to encounter in this journey?" << endl<<endl;
 	cout << "How many monsters do you think you'll encounter: ";
-	int x = 0, crazy = 0, end = 0, potions = 3, hp=50, score = 0, multiplier = 0;
+	int x = 0, crazy = 0, end = 0, potions = 3, hp=50, score = 0, multiplier = 0,  hpAura=0, attackAura = 0, maxMultiplier=0;
 	
 	//opening "cutscene"
 	while (x == 0) {
@@ -628,7 +648,7 @@ int main() {
 	cout << endl << endl << endl;
 	for (int j = 0; j < monster; j++) {
 		int responseInn = 0;
-		fightMonster(resultVector,monster,j,end,multiplier, potions, hp, score, monsterList, moveList, monHealthList, moveValues);
+		fightMonster(maxMultiplier,hpAura,attackAura,resultVector,monster,j,end,multiplier, potions, hp, score, monsterList, moveList, monHealthList, moveValues);
 		if (end == 0) {
 			cin >> responseInn;
 			if (responseInn == 1) {
@@ -640,6 +660,17 @@ int main() {
 				cout << endl << endl << "You decided to continue your journey." << endl << endl << endl;
 			}
 		}
-		else { cout << gover << score; j += 100000; }
+		else { cout << gover << score << endl << endl; j += 100000; }
 	}
+	cout << "Wizzard Wallace: My my, welcome back Warrior. Your journey truly was succesful wasn't it. Could we possible have your name so we know to summon you when we need you again?" << endl << endl;
+	string playerName;
+	cout << "What's your name: ";
+	cin >> playerName;
+	string Score = "Name: ";
+	Score += playerName + "\nScore: " + to_string(score) + "\nMaximum Multiplier: "+to_string(maxMultiplier)+"\nHP Aura Bonus: "+to_string(hpAura)+"\nAttack Aura Bonus: "+to_string(attackAura)+"\nMonsters fought: ";
+	for (int k=0; k < monster; k++) { Score += resultVector[k] + "\n"; }
+	ofstream myfile;
+	myfile.open("Score.txt");
+	myfile << Score;
+	myfile.close();
 }
