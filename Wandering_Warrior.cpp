@@ -726,7 +726,7 @@ int main() {
 	cin >> playerName;
 	string Score = "Name: ";
 	Score += playerName + "\nScore: " + to_string(score) + "\nMaximum Multiplier: "+to_string(maxMultiplier)+"\nHP Aura Bonus: "+to_string(hpAura)+"\nAttack Aura Bonus: "+to_string(attackAura)+"\nMonsters fought: ";
-	for (int k=0; k <=killedMonster; k++) { Score += resultVector[k] + "\n"; }
+	for (int k=0; k <=resultVector.size(); k++) { Score += resultVector[k] + "\n"; }
 	ofstream myfile;
 	myfile.open("Score.txt");
 	myfile << Score;
