@@ -8,9 +8,7 @@
 
 using namespace std;
 
-int randNumber(int upper, int lower) {
-	//upper is the upper limit number and lower is the lower limit number
-	//this function is made to generate a number between upper adn lower
+int randNumber(int upper, int lower) { // the program that will generate the random number
 	int Y = rand() % ((upper - lower) + 1) + lower;
 	
 	return Y;
@@ -19,13 +17,6 @@ int randNumber(int upper, int lower) {
 }
 
 void critCalculator(int CritVal, int &Damage, int CritChance, int &CritIndicator){
-	//CritVal is the "wall" which determines whether an attack critically strikes
-	//Damage is the initial damage that the attack would do if it weren't to critically strike, if it were to it would be put into the bellow equztion so as to be amplified
-	//CritChance is the randomly generated value that will get tested against CritChance to see if the attack will critically strike
-	//CritIndicator is the test case to be tested later inorder to display certain dialogue if the attack critically struck
-	//if CritVal(pre-determined) is smaller tham CritChance (randomly generated), the attacck will thereby critically strike
-	
-
 	if (CritChance > CritVal) {
 		if (Damage % 2 == 0) { Damage = Damage * 1.5; }
 		else {
@@ -35,12 +26,7 @@ void critCalculator(int CritVal, int &Damage, int CritChance, int &CritIndicator
 	}
 }
 
-int usePotion(int& hp, int& potionIndicator, int maxHP, int healVal) {
-	//hp is the current health of the user
-	//potionIndicator is an integer for a test case to see if the player or monster used a healing item or attack inorder to output the appropriate dialogue
-	//maxHP is the maximum possible health of the user
-	//healVal is the ammount that was healed by the user to be outputted by the system
-
+int usePotion(int& hp, int& potionIndicator, int maxHP, int healVal) {	
 	if ((hp+healVal) > maxHP) {
 		hp = maxHP;
 		potionIndicator++;
@@ -50,62 +36,45 @@ int usePotion(int& hp, int& potionIndicator, int maxHP, int healVal) {
 	
 }
 
-void fightMonster(int &maxMultiplier,int &hpAura, int &attackAura, vector<string>&resultVector, int &monster, int j, int& end, int& multiplier, int& potions, int& hp, int& score, vector<string> monsterList, vector<vector<string>> moveList, vector<vector<int>> monHealthList, vector<vector<int>> moveValues) {
-	//maxMultiplier is a global variable that will be updated later in the code and will be used for the player's final score at the end of game summary
-	//hpAura and attackAura are bonuses given after defeating a difficult monster
-	//resultVector is a vector that stores the monsters you have faught for the end of game summary
-	//monster is the number of monsters the player will fight that he/she inputted at the start
-	//j is the jth monster that the player is fighting, its purpose is simply for displaying the player's progress
-	//end is a test case integer to see if the player has died or not warranting a "game over"
-	//multiplier is the ongiong multiplier applied onto the player's score
-	//potions is the current number of potions the player has at the moment
-	//hp is the current health of the player
-	//score is the current score of the player
-	//monsterList is the vector with all the names of the monsters (100 different monsters)
-	//moveList is the vector containing vectors of the moves a monster can use
-	//monHealth is the vector of all the health ranges of each monster in the format {upperLimit, lower,Limit}
-	//moveValues is the vector containing vectors of the damage each move can deal
-
-
-
-	int call = randNumber(100, 0); //which monster the player will encounter
+void fightMonster(int &maxMultiplier,int &hpAura, int &attackAura, vector<string>&resultVector, int &monster, int j, int& end, int& multiplier, int& potions, int& hp, int& score, vector<string> monsterList, vector<vector<string>> moveList, vector<vector<int>> monHealthList, vector<vector<int>> moveValues) {//, vector for abilities and such) {
+	int call = randNumber(100, 0);
 	int playerAction = 0;
 	
 	cout << "A " << monsterList[call] << " blocks your path " << endl << endl;
 	
 	//monster stats
 	int hpUpperLimit = monHealthList[call][0], hpLowerLimit = monHealthList[call][1]; 
-	int maxHpMonster = randNumber(hpUpperLimit, hpLowerLimit); //randomly generates the health of the monster within a given range
+	int maxHpMonster = randNumber(hpUpperLimit, hpLowerLimit);
 	int monMoveVectorMax = moveList[call].size(), monMoveVectorMin=0;
 	int currentHpMonster = maxHpMonster;
+	//string UI = "Player HP: " + to_string(hp) + "/50				" + monsterList[call] + " HP: " + to_string(currentHpMonster)+ "/" + to_string(maxHpMonster) + "\n" 
+	//		+	"Potions: " + to_string(potions) + "\n"
+	//		+	"Action:	1 Strike 4 power	- Higher chance to critically strike\n	2 Lunge 7 power		- Decreases your chance to dodge the enemy's attack\n	3 Parry 5 power		- Increases your chance to dodge the enemy's attack\n	4 Potion		- Heals 10 HP\n	5 Block			- Decreases the damage of enemy's incoming attack"; // using 4 tabs of separation
 	
+	string playerAttackName = "";
+	int playerDodgeVal = 90, monDodgeVal = 90, playerCritVal = 70 , monCritVal = 80;
 
-	string playerAttackName = ""; //placeholder for what the name player's chose attack
+	//special characteristics for monsters
+	if (call == 51) { monDodgeVal = 10; }
+	if (call == 7) { monCritVal = 40; }
+	int futureValue = 0, expandConstant = 0, contractConstant = 0, legendMonsterBonus = 0, highMonsterBonus = 0, strikeDmg = 5, lungeDmg = 7, parryDmg = 5;
 
-	
-	int futureValue = 0, expandConstant = 0, contractConstant = 0, legendMonsterBonus = 0, highMonsterBonus = 0, strikeDmg = 5, lungeDmg = 7, parryDmg = 5, tempestIndicator = 0;
-
-	//list of "legend" monsters for the bonus after defeating them
+	//list of legend monsters for the bonus
 	if (call == 25 or call == 30 or call == 39 or call == 48 or call == 54 or call == 55 or call == 76 or call == 78) {
 		legendMonsterBonus = 10; }
-	//list of "high" monsters for the bonus
+	//list of high monsters for the bonus
 	if (call == 20 or call == 13 or call == 14 or call == 17 or call == 18 or call == 24 or call == 56 or call == 57 or call == 58 or call == 59 or call == 87 or call == 93 or call == 70){ 
 		highMonsterBonus = 5; }
 
-	
-	//All the below code represents one round 
 	while (hp > 0 and currentHpMonster > 0) {
 		int playerMaxHealth = 50 + (hpAura * 5);
-		int playerDodgeVal = 90, monDodgeVal = 90, playerCritVal = 70, monCritVal = 80;//base stats of the player and the monster
-		//special characteristics for certain monsters
-		if (call == 51) { monDodgeVal = 10; }
-		if (call == 7) { monCritVal = 40; }
+		int playerDodgeVal = 90, monDodgeVal = 90, playerCritVal = 70, monCritVal = 80;
 
 		string UI = "Player HP: " + to_string(hp) + "/" + to_string(playerMaxHealth) +"     "+"		"+ monsterList[call] + " HP: " + to_string(currentHpMonster) + "/" + to_string(maxHpMonster) + "\n"
 			+ "Potions: " + to_string(potions) + "\n"
-			+ "Action:	(1) Strike " + to_string(strikeDmg + attackAura) + " power	- Higher chance to critically strike\n	(2) Lunge " + to_string(lungeDmg + attackAura) + " power		- Decreases your chance to dodge the enemy's attack\n	(3) Parry " + to_string(parryDmg + attackAura) + " power		- Increases your chance to dodge the enemy's attack\n	(4) Potion		- Heals 10 HP\n	(5) Block			- Decreases the damage of enemy's incoming attack"; // using 4 tabs of separation
+			+ "Action:	1 Strike " + to_string(strikeDmg + attackAura) + " power	- Higher chance to critically strike\n	2 Lunge " + to_string(lungeDmg + attackAura) + " power		- Decreases your chance to dodge the enemy's attack\n	3 Parry " + to_string(parryDmg + attackAura) + " power		- Increases your chance to dodge the enemy's attack\n	4 Potion		- Heals 10 HP\n	5 Block			- Decreases the damage of enemy's incoming attack"; // using 4 tabs of separation
 
-		
+		//All this code represents one round 
 		//Evalluating which attack the monster will use
 		int monAttackValue = randNumber((monMoveVectorMax-1), monMoveVectorMin);
 		//Evaluating the critical strike chance and dodge chance for both player and monster, whether a player or monster crits or dodges
@@ -156,18 +125,11 @@ void fightMonster(int &maxMultiplier,int &hpAura, int &attackAura, vector<string
 			cout << endl;
 
 		}
-
-		
 		
 		//monster damage calculation
 		string monAttackName = moveList[call][monAttackValue];
 		monDamage = moveValues[call][monAttackValue] + monBonus;
-
-		//if the monster used a futureAttack the last round which empoers the current round's attack
 		if (futureValue != 0) { monDamage += 5; futureValue = 0;}
-
-		//Tempest is an effecct inflicted by a monster which makes players unable to dodge 
-		if (tempestIndicator == 1) { playerDodgeVal = 0; tempestIndicator = 0; }
 		
 		//checking the type of attack the monster uses: strikeAttacks, multiAttacks, lungeAttacks, divinity, agileAttacks, snowAttacks, drain, futureAttacks, invent, 
 		//deathWish, orbOfTheSun, tempestAttacks, expand, contract, and holdPosition 
@@ -246,12 +208,6 @@ void fightMonster(int &maxMultiplier,int &hpAura, int &attackAura, vector<string
 			critCalculator(monCritVal, monDamage, critChanceMon, monCritIndicator);
 		}
 
-		//tempestAttacks: Prevent players from dodging an attack
-		else if (monAttackName == "Tempest") {
-			critCalculator(monCritVal, monDamage, critChanceMon, monCritIndicator);
-			tempestIndicator = 1;
-		}
-
 		//expand: a passive attack increasing the users size which increases its health by 20 being able to go over its health maximum value
 		else if (monAttackName == "Expand") {
 			if (expandConstant == 0) {
@@ -305,7 +261,7 @@ void fightMonster(int &maxMultiplier,int &hpAura, int &attackAura, vector<string
 				}
 			}
 		}
-		//if the player used a potion is below
+
 		else {
 			cout << "You healed yourself for 10 HP consuming 1 potion."<<endl<<endl;
 		}
@@ -314,8 +270,7 @@ void fightMonster(int &maxMultiplier,int &hpAura, int &attackAura, vector<string
 		if(currentHpMonster>0){
 			//if the player successfully dodges the attack
 			if (dodgeChancePlayer > playerDodgeVal) {
-				//deathWish's effect	
-				if (deathWishIndicator > 0) {
+					if (deathWishIndicator > 0) {
 						hp -= 10;
 						cout << "The enemy " << monsterList[call] << " dealt 10 damage to the player with " << monAttackName << "." << endl << endl;
 						if (playerBlockIndicator > 1) { cout << "You could not block this attack." << endl << endl; }
@@ -326,15 +281,12 @@ void fightMonster(int &maxMultiplier,int &hpAura, int &attackAura, vector<string
 
 			else {
 				
-				//if the player used Block
 				if (playerBlockIndicator > 0 and divinityIndicator ==0) {
 					if (monDamage <= 10) { monDamage = 0; }
 					else { monDamage -= 10; }
 					cout << "You blocked the enemy " << monsterList[call] << "'s " << monAttackName << " taking " << monDamage << " HP damage." << endl << endl;
 					
 				}
-
-				//if it was any attack
 				else if (monMultiIndicator == 0 and divinityIndicator == 0 and contractIndicator == 0 and expandIndicator == 0){
 					if (monCritIndicator == 0) {
 						cout << "The enemy " << monsterList[call] << "'s " << monAttackName << " dealt " << monDamage << " HP." << endl << endl;
@@ -346,8 +298,6 @@ void fightMonster(int &maxMultiplier,int &hpAura, int &attackAura, vector<string
 						hp -= monDamage;
 					}
 				}
-
-				//if the monster used a multiAttack
 				else if (monMultiIndicator > 0) {
 					if (monCritIndicator == 0) {
 						cout << "The enemy " << monsterList[call] << "'s " << monAttackName << " hit " << noMulti << " times and dealt a total of " << monDamage << "." << endl << endl;
@@ -388,15 +338,13 @@ void fightMonster(int &maxMultiplier,int &hpAura, int &attackAura, vector<string
 					cout << monAttackName << " empowers " << monsterList[call] << "'s next attack." << endl << endl;
 				}
 
-				//if a monster used a tempestAttack
-				if (tempestIndicator > 0) {
-					cout << "A Tempest is roaring behing the enemy's back, You can't dodge his next attack.";
-				}
+				
+				
 
 			}
 		
 		}
-		//what shows up after you have defeated a monster
+	
 		if (currentHpMonster <= 0) {
 			score += 10 + legendMonsterBonus + highMonsterBonus + multiplier * (10 + legendMonsterBonus + highMonsterBonus);
 			multiplier++;
@@ -425,11 +373,10 @@ void fightMonster(int &maxMultiplier,int &hpAura, int &attackAura, vector<string
 				end++;
 			}
 			if (end == 0){
-				cout << "Score: " << score << "		Multiplier: " << multiplier << "		Monsters: " << j + 1 << "/" << monster << endl << endl << "Would you like to stop at an inn and rest? (This will reset your score multiplier)" << endl << endl << "(1) - Rest at the Inn		(2) - Continue onwards" << endl << endl << "Please type the number of your choice: ";
+				cout << "Score: " << score << "		Multiplier: " << multiplier << "		Monsters: " << j + 1 << "/" << monster << endl << endl << "Would you like to stop at an inn and rest? (This will reset your score multiplier)" << endl << endl << "1 - Rest at the Inn		2 - Continue onwards" << endl << endl << "Please type the number of your choice: ";
 			}
 			
 		}
-		//or if you were killed by one
 		else if (hp <= 0)
 		{
 			cout << "You have been slain by the " << monsterList[call] << "." << endl << endl;
@@ -452,11 +399,11 @@ void fightMonster(int &maxMultiplier,int &hpAura, int &attackAura, vector<string
 int main() {
 	int monster;
 
-	//list of monster/enemy names
+
 	vector<string> monsterList = { "Slow Slime", "Swift Slime", "Goblin Hoard", 
 		"Shadow Mage", "Leviathan Worshiper", "Haunted Sword", "Blind Priest", "Lucky Larry", "Grime Mage", "Hungry Tom", "Mutant Hog", "Swarming Bees", "Biding Bison", "Rat King", "Tree Ogre", "Feral Wolf", "Other Warrior", "Overgrown Lizard", "River Spirit","Three Headed Snake", "Upper Half of A Giant", "Lava Mage", "Blood Bat", "Shadow Ninja", "Lower Half of A Giant", "Headless Man-horse", "Fire Goose", "The Rock", "Cactus Toad", "Desert Bandit", "Leviathan", "Arctic Fox", "Huge Snowman", "Apex Sandworm", "Spike Raptor", "Spiked Dolphin", "Vampire Turtle", "Infected Bat", "Steel Armadillo", "Frostbitten Dragon", "Hammer Crab", "Mermaid", "Diver Falcon", "Sonic Bear", "Thunder Raven", "Dimension-hopping Scientist", "Fragrant Flytrap", "Lancehorn Rhino", "Devil's General", "Land Pirannahs", "Boot Head", "Mr Dodge", "Vine Witch", "Sneaky Rat", "Enlightend Elephant Mage", "Reaper", "Lion Of War", "Tiger Of Battle", "Puma Of Engage", "Goblin Emperor", "Windmill Keeper", "Cannon Snail", "Karate Rabbitman", "Gatling Rooster", "Old Tree Spirit", "Swamp Anglerfish", "Coat Ghost", "Insane Baker", "Trident Fishman", "Flower Ghoul", "Orchid Salamander", "Sand Hedgehog", "Ore Tortoise", "Trap-mouth Hippo", "Radar Owl", "Mud Titan", "Wrath Wyvern", "Fungus Ant", "Chang Baitu", "Athune the Brave", "Lightning Wolf", "Bog Bridge Troll", "Spirit Drummer", "Zap Mouse", "Lake Serpent", "Tower Saver", "Foul Shroom", "Rose Queen", "Spear Gazelle", "Echo Wasp", "Horned Pig", "Haunted Practice Dummy", "Pile Raiders", "Jaguar of Savagery", "Tunneling Meerkat Crew", "Aether Jellyfish", "Boulder Pufferfish", "Scythe Tucan", "Lime Slime", "Bad Trumpeter", "Honey Grizzly" };
 
-	//list of monster/enemy moves/attacks
+
 	vector<vector<string>> moveList = { {"Lunge", "Plop"},
 	{"Lunge", "Plop", "Strike"},
 	{"Combined Attack", "Combined Attack", "Toss A Mate", "Multihit"},
@@ -557,7 +504,7 @@ int main() {
 	{"Strike", "Agility Dive","Lunge","Slash"},
 	{"Plop", "Multihit", "Lunge"},{"Roar", "Strike", "Blast"},{"Strike", "Bash", "Back Stab", "Silence"} };
 
-	//list of the damage of the moves/attacks
+
 	vector<vector<int>> moveValues = {
 	{5, 4},
 	{5,4,4},
@@ -659,11 +606,10 @@ int main() {
 	{3,6,5,7},
 	{4,3,5},{5,4,5},{3,5,5,4} };
 
-	//list of the ranges of theri health
+
 	vector<vector<int>> monHealthList = {{25,15},{30,25},{32,30},{35,30},{37,30},{25,20},{25,25},{30,23},{25,20},{32,28},{30,27},{35,30},{40,37},{50,40},{55,40},{35,30},{35,35},{45,43},{39,37},{35,32},{50,45},{40,37},{25,20},{35,32},{50,45},{37,33},{27,23},{45,43},{27,22},{30,25},{105,60},{32,25},{40,38},{46,30},{33,30},{27,25},{30,25},{22,20},{40,32},{105,60},{35,30},{35,32},{27,25},{32,30},{32,25},{40,32},{30,23},{32,30},{60,45},{30,24},{29,21},{5,5},{29,25},{28,25},{41,39},{45,35},{50,42},{50,42},{50,42},{53,40},{30,27},{23,19},{32,28},{32,24},{32,22},{37,29},{27,23},{34,23},{32,30},{32,27},{37,35},{29,23},{43,40},{43,37},{29,23},{42,40},{80,47},{23,19},{35,27},{39,32},{32,30},{29,23},{29,23},{27,26},{33,29},{31,26},{27,19},{29,26},{27,23},{30,25},{29,23},{30,23},{32,30},{50,42},{30,25},{35,25},{35,30},{32,29},{25,20},{29,27},{35,30}
 	};
 
-	//list to store the monsters the player has faught
 	vector<string> resultVector;
 
 
@@ -706,9 +652,9 @@ int main() {
 	for (int j = 0; j < monster; j++) {
 		int responseInn = 0;
 		fightMonster(maxMultiplier,hpAura,attackAura,resultVector,monster,j,end,multiplier, potions, hp, score, monsterList, moveList, monHealthList, moveValues);
+		killedMonster++;
 		if (end == 0) {
 			cin >> responseInn;
-			killedMonster++;
 			if (responseInn == 1) {
 				hp = 50+(hpAura*5);
 				multiplier = 0;
@@ -725,10 +671,14 @@ int main() {
 	cout << "What's your name: ";
 	cin >> playerName;
 	string Score = "Name: ";
+	cout<<endl<<endl;
+	
 	Score += playerName + "\nScore: " + to_string(score) + "\nMaximum Multiplier: "+to_string(maxMultiplier)+"\nHP Aura Bonus: "+to_string(hpAura)+"\nAttack Aura Bonus: "+to_string(attackAura)+"\nMonsters fought: ";
-	for (int k=0; k <=killedMonster; k++) { Score += resultVector[k] + "\n"; }
+	for (int k=0; k <killedMonster; k++) { Score += resultVector[k] + "\n"; }
 	ofstream myfile;
 	myfile.open("Score.txt");
 	myfile << Score;
 	myfile.close();
+	cout<<"Your game summary was saved as 'Score.txt'!";
+	
 }
