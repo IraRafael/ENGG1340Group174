@@ -146,7 +146,7 @@ void fightMonster(int &maxMultiplier,int &hpAura, int &attackAura, vector<string
 			else if (playerAction == 4) {
 				if (potions > 0)
 				{
-					usePotion(hp, playerPotionIndicator, 50, 10);
+					usePotion(hp, playerPotionIndicator, playerMaxHealth, 15);
 					y++;
 					potions--;
 				}
@@ -690,7 +690,7 @@ int main() {
 		}
 		else {
 			cout << endl;
-			cout << "Wizzard Wallace: WOW! That's great, I'm glad we found a true warrior for this journey!" << endl << endl << "Wizzard Wallace: I am sure you are familiar with your weapon the Blade, it does 7 damage when it hits and has a 20% chance to critically strike." << endl << endl;
+			cout << "Wizzard Wallace: WOW! That's great, I'm glad we found a true warrior for this journey!" << endl << endl << "Wizzard Wallace: I am sure you are familiar with your weapon the Blade, it does 7 damage at most when it hits and has a 20% chance to critically strike." << endl << endl;
 			x++;
 		}
 
@@ -698,7 +698,7 @@ int main() {
 
 	}
 
-	cout << "Wizzard Wallace: We will be sending you off on your journey now, have 3 potions, you may need it to restore 10 HP. You may just follow the path and you surely will be fine! Best of luck Warrior!" << endl << endl << endl;
+	cout << "Wizzard Wallace: We will be sending you off on your journey now, have 3 potions, you may need it to restore 15 HP. You may just follow the path and you surely will be fine! Best of luck Warrior!" << endl << endl << endl;
 
 	cout << "Type anything and hit enter to start: ";
 	cin >> startplaceholder;
