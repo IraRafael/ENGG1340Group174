@@ -17,13 +17,14 @@ Above is the equation used to calculate the score using the multiplier as shown,
 
 Many events from the game, namely the chance of critical strike, what monsters will appear, and what attacks they will use against you, will make use of a random number generator. This includes codes from <rand>, <ctime> and <cstdlib>. The random number generator will be a function returning the random number for use in the main code. The function used from my code is shown bellow: 
  
+//upper is the upper limit number and lower is the lower limit number
+	//this function is made to generate a number between upper adn lower 
+
 int randNumber(int upper, int lower) {
-	//upper is the upper limit number and lower is the lower limit number
-	//this function is made to generate a number between upper adn lower
 	int Y = rand() % ((upper - lower) + 1) + lower;
-	
 	return Y;
 }
+
 
 Where Y is the number that is then used for the process that this code was sued for: eg, critical strike chance calculation.
 Also the random number generator is linked with vector lists from <vector> which are lists of the monsters and a list of their attributes like health and their attacking moves and the respective damage.
